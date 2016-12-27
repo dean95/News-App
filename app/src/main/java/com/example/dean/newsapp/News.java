@@ -12,6 +12,21 @@ public class News {
         this.section = section;
     }
 
+    public News(String title, String section, String datePublished, String webUrl) {
+        this.title = title;
+        this.section = section;
+        this.datePublished = datePublished;
+        this.webUrl = webUrl;
+    }
+
+    public News(String title, String section, String datePublished, String webUrl, String author) {
+        this.title = title;
+        this.section = section;
+        this.datePublished = datePublished;
+        this.webUrl = webUrl;
+        this.author = author;
+    }
+
     public String getTitle() {
         return title;
     }
