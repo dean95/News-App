@@ -97,15 +97,20 @@ public class NewsActivity extends AppCompatActivity
 
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
-        SharedPreferences sharePrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String content = sharePrefs.getString(
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String content = sharedPrefs.getString(
                 getString(R.string.settings_content_key),
                 getString(R.string.settings_content_default));
+
+        String orderBy = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default));
 
         Uri baseUri = Uri.parse(GUARDIAN_REQUEST_URL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
         uriBuilder.appendQueryParameter("q", content);
+        uriBuilder.appendQueryParameter("order-by", orderBy);
 
         return new NewsLoader(this, uriBuilder.toString() + API_KEY);
     }
