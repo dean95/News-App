@@ -18,6 +18,8 @@
         android:textSize="12sp"
         android:textAllCaps="true"
         android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
         tools:text="Technology"/>
     
     <LinearLayout
