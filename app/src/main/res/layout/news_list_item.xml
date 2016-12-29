@@ -30,6 +30,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textColor="@color/textColorNewsHeadline"
             android:textSize="16sp"
             tools:text="Facebook copies Snapchat feature for 15th time"/>

@@ -1,6 +1,8 @@
 package com.example.dean.newsapp;
 
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,8 +11,18 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class NewsActivity extends AppCompatActivity {
+public class NewsActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<List<News>> {
+    private static final String LOG_TAG = NewsActivity.class.getSimpleName();
+
+    private static final int NEWS_LOADER_ID = 1;
+
+    private static final String GUARDIAN_REQUEST_URL =
+            "http://content.guardianapis.com/search?q=football&api-key=test";
+
+    private NewsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,9 +31,7 @@ public class NewsActivity extends AppCompatActivity {
 
         ListView newsListView = (ListView) findViewById(R.id.list);
 
-        ArrayList<News> news = QueryUtils.extractNews();
-
-        final NewsAdapter adapter = new NewsAdapter(this, news);
+        adapter = new NewsAdapter(this, new ArrayList<News>());
 
         newsListView.setAdapter(adapter);
 
@@ -37,5 +47,27 @@ public class NewsActivity extends AppCompatActivity {
                 startActivity(websiteIntent);
             }
         });
+
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+    }
+
+    @Override
+    public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
+        return new NewsLoader(this, GUARDIAN_REQUEST_URL);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
+        adapter.clear();
+
+        if(news != null && !news.isEmpty()) {
+            adapter.addAll(news);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<News>> loader) {
+        adapter.clear();
     }
 }
