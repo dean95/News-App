@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class NewsActivity extends AppCompatActivity
             "http://content.guardianapis.com/search?q=football&api-key=test";
 
     private NewsAdapter adapter;
+    private TextView emptyStateView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,9 @@ public class NewsActivity extends AppCompatActivity
         setContentView(R.layout.activity_news);
 
         ListView newsListView = (ListView) findViewById(R.id.list);
+
+        emptyStateView = (TextView) findViewById(R.id.empty_view);
+        newsListView.setEmptyView(emptyStateView);
 
         adapter = new NewsAdapter(this, new ArrayList<News>());
 
@@ -59,6 +64,7 @@ public class NewsActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
+        emptyStateView.setText(R.string.no_news);
         adapter.clear();
 
         if(news != null && !news.isEmpty()) {
