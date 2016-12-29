@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewsActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<News>> {
+        implements LoaderManager.LoaderCallbacks<List<News>>,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String LOG_TAG = NewsActivity.class.getSimpleName();
 
     private static final int NEWS_LOADER_ID = 1;
@@ -30,8 +31,6 @@ public class NewsActivity extends AppCompatActivity
             "https://content.guardianapis.com/search";
 
     private static final String API_KEY = "&api-key=test";
-
-        //    "http://content.guardianapis.com/search?q=football&api-key=test";
 
     private NewsAdapter adapter;
     private TextView emptyStateView;
@@ -49,6 +48,9 @@ public class NewsActivity extends AppCompatActivity
         adapter = new NewsAdapter(this, new ArrayList<News>());
 
         newsListView.setAdapter(adapter);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
         newsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -131,5 +133,20 @@ public class NewsActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<List<News>> loader) {
         adapter.clear();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(getString(R.string.settings_content_key)) ||
+                key.equals(getString(R.string.settings_order_by_key))) {
+            adapter.clear();
+
+            emptyStateView.setVisibility(View.GONE);
+
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.VISIBLE);
+
+            getLoaderManager().restartLoader(NEWS_LOADER_ID, null,this);
+        }
     }
 }
