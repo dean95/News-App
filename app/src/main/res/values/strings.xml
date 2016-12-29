@@ -5,4 +5,8 @@
 
     <string name="settings_menu_item">Settings</string>
     <string name="settings_title">News Settings</string>
+
+    <string name="settings_content_label">Content</string>
+    <string name="settings_content_key">content</string>
+    <string name="settings_content_default">football</string>
 </resources>
