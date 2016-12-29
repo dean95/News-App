@@ -3,17 +3,21 @@ package com.example.dean.newsapp;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +29,11 @@ public class NewsActivity extends AppCompatActivity
     private static final int NEWS_LOADER_ID = 1;
 
     private static final String GUARDIAN_REQUEST_URL =
-            "http://content.guardianapis.com/search?q=football&api-key=test";
+            "https://content.guardianapis.com/search";
+
+    private static final String API_KEY = "&api-key=test";
+
+        //    "http://content.guardianapis.com/search?q=football&api-key=test";
 
     private NewsAdapter adapter;
     private TextView emptyStateView;
@@ -91,7 +99,17 @@ public class NewsActivity extends AppCompatActivity
 
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
-        return new NewsLoader(this, GUARDIAN_REQUEST_URL);
+        SharedPreferences sharePrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String content = sharePrefs.getString(
+                getString(R.string.settings_content_key),
+                getString(R.string.settings_content_default));
+
+        Uri baseUri = Uri.parse(GUARDIAN_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        uriBuilder.appendQueryParameter("q", content);
+        
+        return new NewsLoader(this, uriBuilder.toString() + API_KEY);
     }
 
     @Override
