@@ -3,6 +3,8 @@ package com.example.dean.newsapp;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -53,8 +55,19 @@ public class NewsActivity extends AppCompatActivity
             }
         });
 
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+        ConnectivityManager connMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connMan.getActiveNetworkInfo();
+
+        if(networkInfo != null && networkInfo.isConnectedOrConnecting()) {
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+        } else {
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.GONE);
+
+            emptyStateView.setText(R.string.no_internet_connection);
+        }
     }
 
     @Override
