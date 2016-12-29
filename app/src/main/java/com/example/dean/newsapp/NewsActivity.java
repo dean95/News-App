@@ -64,6 +64,9 @@ public class NewsActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.GONE);
+
         emptyStateView.setText(R.string.no_news);
         adapter.clear();
 
