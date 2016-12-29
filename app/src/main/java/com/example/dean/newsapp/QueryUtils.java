@@ -1,148 +1,113 @@
 package com.example.dean.newsapp;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 public class QueryUtils {
-    private static final String JSON_SAMPLE = "{\n" +
-            "  \"response\": {\n" +
-            "    \"status\": \"ok\",\n" +
-            "    \"userTier\": \"developer\",\n" +
-            "    \"total\": 47378,\n" +
-            "    \"startIndex\": 1,\n" +
-            "    \"pageSize\": 10,\n" +
-            "    \"currentPage\": 1,\n" +
-            "    \"pages\": 4738,\n" +
-            "    \"orderBy\": \"relevance\",\n" +
-            "    \"results\": [\n" +
-            "      {\n" +
-            "        \"id\": \"technology/2016/dec/20/2016-tech-winners-losers-facebook-peter-thiel\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"technology\",\n" +
-            "        \"sectionName\": \"Technology\",\n" +
-            "        \"webPublicationDate\": \"2016-12-20T08:00:43Z\",\n" +
-            "        \"webTitle\": \"The tech winners and losers of 2016 (hint: Facebook – and Facebook)\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/technology/2016/dec/20/2016-tech-winners-losers-facebook-peter-thiel\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/technology/2016/dec/20/2016-tech-winners-losers-facebook-peter-thiel\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"technology/2016/dec/16/facebook-copies-snapchat-feature-for-15th-time\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"technology\",\n" +
-            "        \"sectionName\": \"Technology\",\n" +
-            "        \"webPublicationDate\": \"2016-12-16T09:44:23Z\",\n" +
-            "        \"webTitle\": \"Facebook copies Snapchat feature for 15th time\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/technology/2016/dec/16/facebook-copies-snapchat-feature-for-15th-time\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/technology/2016/dec/16/facebook-copies-snapchat-feature-for-15th-time\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"technology/2016/dec/22/facebook-break-can-boost-wellbeing-study-suggests\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"technology\",\n" +
-            "        \"sectionName\": \"Technology\",\n" +
-            "        \"webPublicationDate\": \"2016-12-22T10:55:14Z\",\n" +
-            "        \"webTitle\": \"Facebook break can boost wellbeing, study suggests\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/technology/2016/dec/22/facebook-break-can-boost-wellbeing-study-suggests\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/technology/2016/dec/22/facebook-break-can-boost-wellbeing-study-suggests\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"media/2016/dec/12/facebook-an-antidote-to-mainstream-media\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"media\",\n" +
-            "        \"sectionName\": \"Media\",\n" +
-            "        \"webPublicationDate\": \"2016-12-12T19:47:18Z\",\n" +
-            "        \"webTitle\": \"Facebook an antidote to mainstream media | Letters\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/media/2016/dec/12/facebook-an-antidote-to-mainstream-media\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/media/2016/dec/12/facebook-an-antidote-to-mainstream-media\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"tv-and-radio/tvandradioblog/2016/oct/13/facebook-live-hosts-ground-breaking-interactive-mystery\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"tv-and-radio\",\n" +
-            "        \"sectionName\": \"Television & radio\",\n" +
-            "        \"webPublicationDate\": \"2016-10-13T10:31:39Z\",\n" +
-            "        \"webTitle\": \"Facebook Live hosts groundbreaking interactive murder mystery\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/tv-and-radio/tvandradioblog/2016/oct/13/facebook-live-hosts-ground-breaking-interactive-mystery\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/tv-and-radio/tvandradioblog/2016/oct/13/facebook-live-hosts-ground-breaking-interactive-mystery\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"technology/2016/oct/12/facebook-censors-le-monde-mammogram-screening-photo-breast-anti-nipple-policy\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"technology\",\n" +
-            "        \"sectionName\": \"Technology\",\n" +
-            "        \"webPublicationDate\": \"2016-10-12T08:51:23Z\",\n" +
-            "        \"webTitle\": \"Facebook censors Le Monde's mammogram screening photo\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/technology/2016/oct/12/facebook-censors-le-monde-mammogram-screening-photo-breast-anti-nipple-policy\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/technology/2016/oct/12/facebook-censors-le-monde-mammogram-screening-photo-breast-anti-nipple-policy\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"technology/2016/oct/09/facebook-revenge-pornography-case-could-open-floodgates\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"technology\",\n" +
-            "        \"sectionName\": \"Technology\",\n" +
-            "        \"webPublicationDate\": \"2016-10-09T14:21:10Z\",\n" +
-            "        \"webTitle\": \"Facebook revenge pornography trial 'could open floodgates'\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/technology/2016/oct/09/facebook-revenge-pornography-case-could-open-floodgates\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/technology/2016/oct/09/facebook-revenge-pornography-case-could-open-floodgates\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"media/2016/dec/23/strictly-power-spike-press-regulation-facebook-break\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"media\",\n" +
-            "        \"sectionName\": \"Media\",\n" +
-            "        \"webPublicationDate\": \"2016-12-23T09:09:39Z\",\n" +
-            "        \"webTitle\": \"Strictly power spike, press regulation and taking a Facebook break\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/media/2016/dec/23/strictly-power-spike-press-regulation-facebook-break\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/media/2016/dec/23/strictly-power-spike-press-regulation-facebook-break\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"media/2016/dec/21/murdoch-faces-scrutiny-bbc1-tops-ratings-and-eu-charges-facebook\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"media\",\n" +
-            "        \"sectionName\": \"Media\",\n" +
-            "        \"webPublicationDate\": \"2016-12-21T10:01:00Z\",\n" +
-            "        \"webTitle\": \"Murdoch faces scrutiny, BBC1 tops ratings and EU charges Facebook\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/media/2016/dec/21/murdoch-faces-scrutiny-bbc1-tops-ratings-and-eu-charges-facebook\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/media/2016/dec/21/murdoch-faces-scrutiny-bbc1-tops-ratings-and-eu-charges-facebook\",\n" +
-            "        \"isHosted\": false\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"id\": \"technology/2016/dec/20/eu-facebook-misleading-information-whatsapp\",\n" +
-            "        \"type\": \"article\",\n" +
-            "        \"sectionId\": \"technology\",\n" +
-            "        \"sectionName\": \"Technology\",\n" +
-            "        \"webPublicationDate\": \"2016-12-20T14:39:07Z\",\n" +
-            "        \"webTitle\": \"EU charges Facebook with giving 'misleading' information over WhatsApp\",\n" +
-            "        \"webUrl\": \"https://www.theguardian.com/technology/2016/dec/20/eu-facebook-misleading-information-whatsapp\",\n" +
-            "        \"apiUrl\": \"https://content.guardianapis.com/technology/2016/dec/20/eu-facebook-misleading-information-whatsapp\",\n" +
-            "        \"isHosted\": false\n" +
-            "      }\n" +
-            "    ]\n" +
-            "  }\n" +
-            "}";
+    private static final String LOG_TAG = QueryUtils.class.getSimpleName();
 
     private QueryUtils() {
 
     }
 
-    public static ArrayList<News> extractNews() {
-        ArrayList<News> newsList = new ArrayList<>();
+    public static List<News> fetchNewsData(String requestUrl) {
+        URL url = createUrl(requestUrl);
+
+        String jsonResponse = null;
+        try {
+            jsonResponse = makeHttpRequest(url);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Problem making HTTP request", e);
+        }
+        List<News> newsList = extractNews(jsonResponse);
+
+        return newsList;
+    }
+
+    private static String makeHttpRequest(URL url) throws IOException {
+        String jsonResponse = "";
+
+        if(url == null) {
+            return jsonResponse;
+        }
+
+        HttpURLConnection urlConnection = null;
+        InputStream inputStream = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000);
+            urlConnection.setConnectTimeout(15000);
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            if(urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                inputStream = urlConnection.getInputStream();
+                jsonResponse = readFromStream(inputStream);
+            } else {
+                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+            }
+        } catch(IOException e) {
+            Log.e(LOG_TAG, "Problem retrieving the news JSON results", e);
+        } finally {
+            if(urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if(inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return jsonResponse;
+    }
+
+    private static String readFromStream(InputStream inputStream) throws IOException {
+        StringBuilder output = new StringBuilder();
+        if(inputStream != null) {
+            InputStreamReader streamReader = new InputStreamReader(inputStream,
+                    Charset.forName("UTF-8"));
+            BufferedReader reader = new BufferedReader(streamReader);
+            String line = reader.readLine();
+            while(line != null) {
+                output.append(line);
+                line = reader.readLine();
+            }
+        }
+        return output.toString();
+    }
+
+    private static URL createUrl(String stringUrl) {
+        URL url = null;
+        try {
+            url = new URL(stringUrl);
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Problem building the URL", e);
+        }
+        return url;
+    }
+
+    public static List<News> extractNews(String newsJson) {
+        if(TextUtils.isEmpty(newsJson)) {
+            return null;
+        }
+
+        List<News> newsList = new ArrayList<>();
 
         try {
-            JSONObject root = new JSONObject(JSON_SAMPLE);
+            JSONObject root = new JSONObject(newsJson);
 
             JSONObject response = root.getJSONObject("response");
 
@@ -161,7 +126,7 @@ public class QueryUtils {
                 newsList.add(news);
             }
         } catch(JSONException e) {
-            Log.e("QueryUtils", "Problem parsing earthquake JSON result", e);
+            Log.e(LOG_TAG, "Problem parsing earthquake JSON result", e);
         }
         return newsList;
     }

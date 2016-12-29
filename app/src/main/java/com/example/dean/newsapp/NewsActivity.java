@@ -33,7 +33,7 @@ public class NewsActivity extends AppCompatActivity {
                 Uri newsUri = Uri.parse(currentNews.getWebUrl());
 
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, newsUri);
-                
+
                 startActivity(websiteIntent);
             }
         });
